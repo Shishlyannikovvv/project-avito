@@ -178,3 +178,19 @@ func handleServiceError(c *gin.Context, err error) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 	}
 }
+
+func (h *Handler) GetStats(c *gin.Context) {
+	stats, err := h.service.GetReviewerStats(c.Request.Context())
+	if err != nil {
+		handleServiceError(c, err)
+		return
+	}
+
+	// Форматируем для более удобного ответа, включая map
+	response := make(map[string]int)
+	for userID, count := range stats {
+		response[strconv.Itoa(userID)] = count
+	}
+
+	c.JSON(http.StatusOK, gin.H{"reviewer_assignments_count": response})
+}

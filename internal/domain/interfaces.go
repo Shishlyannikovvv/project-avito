@@ -8,6 +8,9 @@ type Repository interface {
 	CreateTeam(ctx context.Context, team *Team) error
 	GetTeamByName(ctx context.Context, name string) (*Team, error)
 
+	// Statistic methods
+	GetReviewerStats(ctx context.Context) (map[int]int, error) // Возвращает map[UserID]Count
+
 	// User methods
 	CreateUser(ctx context.Context, user *User) error
 	GetUserByID(ctx context.Context, id int) (*User, error)

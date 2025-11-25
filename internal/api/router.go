@@ -18,6 +18,9 @@ func SetupRouter(handler *Handler) *gin.Engine {
 		api.POST("/users", handler.CreateUser)
 		api.DELETE("/users/:id", handler.DeactivateUser) // Деактивация пользователя
 
+		// Additional Tasks
+		api.POST("/teams/:id/deactivate", handler.MassDeactivate) // Массовая деактивация
+
 		// Pull Requests
 		api.POST("/prs", handler.CreatePR)          // Создание PR с автоназначением
 		api.POST("/prs/:id/merge", handler.MergePR) // Мердж PR (идемпотентный)

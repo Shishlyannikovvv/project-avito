@@ -111,3 +111,30 @@ func (r *Repository) GetPRsByReviewer(ctx context.Context, reviewerID int) ([]do
 
 	return prs, err
 }
+
+// GetReviewerStats подсчитывает, сколько PR назначено каждому пользователю
+func (r *Repository) GetReviewerStats(ctx context.Context) (map[int]int, error) {
+	var results []struct {
+		UserID int
+		Count  int64
+	}
+
+	// Запрос к join-таблице many2many pr_reviewers
+	err := r.db.WithContext(ctx).
+		Model(&domain.PullRequest{}).
+		Select("pr_reviewers.user_id, count(pull_request_id) as count").
+		Joins("JOIN pr_reviewers ON pr_reviewers.pull_request_id = pull_requests.id").
+		Group("pr_reviewers.user_id").
+		Find(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	stats := make(map[int]int)
+	for _, res := range results {
+		stats[res.UserID] = int(res.Count)
+	}
+
+	return stats, nil
+}
